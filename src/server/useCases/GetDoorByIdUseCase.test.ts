@@ -2,6 +2,7 @@ import { container } from 'tsyringe';
 import { HttpError } from 'http-errors';
 import { BuildingDto } from '@/__mocks__/dtos/BuidlingDto';
 import { DoorDto } from '@/__mocks__/dtos/DoorDto';
+import { ApartmentDto } from '@/__mocks__/dtos/ApartmentDto';
 import { DoorRepository } from '@/server/repositories/DoorRepository';
 import { BuildingRepository } from '@/server/repositories/BuildingRepository';
 import { GetDoorByIdUseCase } from './GetDoorByIdUseCase';
@@ -14,6 +15,13 @@ const buildingDto: BuildingDto = {
   city: 'Zurich',
 };
 
+const apartmentDto: ApartmentDto = {
+  id: '63f4e0797e85310fee059023',
+  name: 'Apartment 1',
+  floor: 1,
+  building_id: buildingDto.id,
+};
+
 const doorDto: DoorDto = {
   id: '63f4d82ef04826419cc6eaeb',
   name: 'Building Main Entrance',
@@ -21,6 +29,16 @@ const doorDto: DoorDto = {
   connection_status: 'online',
   last_connection_status_update: '2023-02-22T22:01:47.573Z',
   building_id: buildingDto.id,
+};
+
+const doorWithApartmentDto: DoorDto = {
+  id: '63f4d8a8e431d9664f409ca4',
+  name: 'Building Main Entrance',
+  connection_type: 'wired',
+  connection_status: 'online',
+  last_connection_status_update: '2023-02-22T22:01:47.573Z',
+  building_id: buildingDto.id,
+  apartment_id: apartmentDto.id,
 };
 
 describe('GetDoorByIdUseCase', () => {
@@ -84,6 +102,27 @@ describe('GetDoorByIdUseCase', () => {
 
     expect(getDoorByIdSpy).toHaveBeenNthCalledWith(1, doorDto.id);
     expect(getBuildingByIdSpy).toHaveBeenNthCalledWith(1, buildingDto.id);
+
+    expect.assertions(3);
+  });
+
+  it('should throw if no apartment could be found', async () => {
+    const getDoorByIdSpy = jest
+      .spyOn(DoorRepository.prototype, 'getDoorById')
+      .mockImplementation(() => Promise.resolve(doorWithApartmentDto));
+
+    const getBuildingByIdSpy = jest
+      .spyOn(BuildingRepository.prototype, 'getBuildingById')
+      .mockImplementation(() => Promise.resolve(buildingDto));
+
+    try {
+      await getDoorByIdUseCase.execute({ doorId: doorDto.id });
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError);
+    }
+
+    expect(getDoorByIdSpy).toHaveBeenNthCalledWith(1, doorDto.id);
+    expect(getBuildingByIdSpy).toHaveBeenNthCalledWith(1, doorDto.building_id);
 
     expect.assertions(3);
   });
