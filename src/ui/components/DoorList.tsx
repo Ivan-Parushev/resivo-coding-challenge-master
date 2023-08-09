@@ -33,9 +33,11 @@ const columns: GridColDef<Door>[] = [
     field: 'connectionStatus',
     headerName: 'Connection status',
     flex: 1,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     renderCell: ({ row: door }) => {
-      return <Typography color="success.main">online</Typography>;
+      const textColor =
+        door.connectionStatus === 'online' ? 'success.main' : 'error.main';
+
+      return <Typography color={textColor}>{door.connectionStatus}</Typography>;
     },
   },
 ];
