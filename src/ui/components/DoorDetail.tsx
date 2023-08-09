@@ -2,6 +2,7 @@ import Typography from '@mui/material/Typography';
 import { Door } from '@/models/Door';
 import { DetailPageContainer } from '@/ui/layout/DetailPageContainer';
 import { DetailPageItem } from '@/ui/layout/DetailPageItem';
+import formatISOdateToLocalDatetime from '@/ui/lib/formatISOdateToLocalDatetime';
 
 interface DoorDetailProps {
   door: Door;
@@ -26,6 +27,11 @@ export function DoorDetail({ door }: DoorDetailProps) {
       </DetailPageItem>
       <DetailPageItem label="Connection status">
         <Typography color={textColor}>{door.connectionStatus}</Typography>
+      </DetailPageItem>
+      <DetailPageItem label="Connection update">
+        <Typography>
+          {formatISOdateToLocalDatetime(door.lastConnectionStatusUpdate)}
+        </Typography>
       </DetailPageItem>
     </DetailPageContainer>
   );

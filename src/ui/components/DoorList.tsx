@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { Door } from '@/models/Door';
 import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import Typography from '@mui/material/Typography';
+import formatISOdateToLocalDatetime from '@/ui/lib/formatISOdateToLocalDatetime';
 
 interface DoorListProps {
   doors: Door[];
@@ -38,6 +39,18 @@ const columns: GridColDef<Door>[] = [
         door.connectionStatus === 'online' ? 'success.main' : 'error.main';
 
       return <Typography color={textColor}>{door.connectionStatus}</Typography>;
+    },
+  },
+  {
+    field: 'lastConnectionStatusUpdate',
+    headerName: 'Last connection',
+    flex: 1,
+    renderCell: ({ row: door }) => {
+      return (
+        <Typography>
+          {formatISOdateToLocalDatetime(door.lastConnectionStatusUpdate)}
+        </Typography>
+      );
     },
   },
 ];
